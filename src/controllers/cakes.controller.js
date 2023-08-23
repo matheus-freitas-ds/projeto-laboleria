@@ -8,6 +8,7 @@ export async function createCake(req, res) {
         if (cake.rowCount !== 0) return res.sendStatus(409)
 
         await db.query(`INSERT INTO cakes (name, price, image, description) VALUES ($1, $2, $3, $4);`, [name, price, image, description])
+        res.sendStatus(201)
     } catch (err) {
         return res.status(500).send(err.message)
     }
