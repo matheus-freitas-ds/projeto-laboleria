@@ -1,7 +1,14 @@
 CREATE TABLE cakes (
   id SERIAL PRIMARY KEY,
-  name VARCHAR(255) NOT NULL,
+  name VARCHAR(255) NOT NULL UNIQUE,
   price NUMERIC(10, 2) NOT NULL,
   image VARCHAR(255) NOT NULL,
   description TEXT
+);
+
+CREATE TABLE clients (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  address VARCHAR(255) NOT NULL,
+  phone VARCHAR(11) NOT NULL
 );

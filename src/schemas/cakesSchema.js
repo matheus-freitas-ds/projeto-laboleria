@@ -6,4 +6,3 @@ export const cakesSchema = Joi.object({
     image: Joi.string().uri().required(),
     description: Joi.string().allow('').required()
 })
-
