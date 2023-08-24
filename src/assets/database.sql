@@ -12,3 +12,12 @@ CREATE TABLE clients (
   address VARCHAR(255) NOT NULL,
   phone VARCHAR(11) NOT NULL
 );
+
+CREATE TABLE orders (
+  id SERIAL PRIMARY KEY,
+  "clientId" INTEGER NOT NULL REFERENCES clients(id),
+  "cakeId" INTEGER NOT NULL REFERENCES cakes(id),
+  quantity INTEGER NOT NULL,
+  "createdAt" TIMESTAMP DEFAULT NOW(),
+  "totalPrice" NUMERIC(10, 2) NOT NULL
+);
