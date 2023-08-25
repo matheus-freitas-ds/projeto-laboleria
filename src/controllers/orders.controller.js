@@ -82,3 +82,57 @@ export async function getOrder(req, res) {
         return res.status(500).send(err.message)
     }
 }
+
+export async function getOrdersById(req, res) {
+    const { id } = req.params
+
+    try {
+        const orderInfo = await db.query(`
+            SELECT 
+                orders.id AS "orderId",
+                orders.quantity AS "orderQuantity",
+                orders."createdAt" AS "orderCreatedAt",
+                orders."totalPrice" AS "orderTotalPrice",
+                clients.id AS "clientId",
+                clients.name AS "clientName",
+                clients.address AS "clientAddress",
+                clients.phone AS "clientPhone",
+                cakes.id AS "cakeId",
+                cakes.name AS "cakeName",
+                cakes.price AS "cakePrice",
+                cakes.description AS "cakeDescription",
+                cakes.image AS "cakeImage"
+            FROM orders
+            JOIN clients ON clients.id = orders."clientId"
+            JOIN cakes ON cakes.id = orders."cakeId"
+            WHERE orders.id = $1;`, [id])
+
+        if (orderInfo.rowCount === 0) return res.sendStatus(404)
+
+        const createdAt = new Date(orderInfo.rows[0].orderCreatedAt).toISOString().slice(0, 16).replace('T', ' ')
+
+        const order = {
+            client: {
+                id: orderInfo.rows[0].clientId,
+                name: orderInfo.rows[0].clientName,
+                address: orderInfo.rows[0].clientAddress,
+                phone: orderInfo.rows[0].clientPhone
+            },
+            cake: {
+                id: orderInfo.rows[0].cakeId,
+                name: orderInfo.rows[0].cakeName,
+                price: orderInfo.rows[0].cakePrice,
+                description: orderInfo.rows[0].cakeDescription,
+                image: orderInfo.rows[0].cakeImage
+            },
+            orderId: orderInfo.rows[0].orderId,
+            createdAt: createdAt,
+            quantity: orderInfo.rows[0].orderQuantity,
+            totalPrice: orderInfo.rows[0].orderTotalPrice
+        }
+
+        res.send(order).status(200)
+    } catch (err) {
+        return res.status(500).send(err.message)
+    }
+}
