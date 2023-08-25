@@ -1,10 +1,10 @@
-import { db } from "../database/database.js"
+import { insertClient, returnClientOrders } from "../repositories/clients.repositories.js"
 
 export async function createClient(req, res) {
     const { name, address, phone } = req.body
 
     try {
-        await db.query(`INSERT INTO clients (name, address, phone) VALUES ($1, $2, $3);`, [name, address, phone])
+        await insertClient(name, address, phone)
 
         res.sendStatus(201)
     } catch (err) {
@@ -16,16 +16,7 @@ export async function getOrdersByClient(req, res) {
     const { id } = req.params
 
     try {
-        const clientOrders = await db.query(`
-            SELECT 
-                 orders.id AS "orderId",
-                 orders."createdAt" AS "orderCreatedAt",
-                 orders.quantity AS "orderQuantity",
-                 orders."totalPrice" AS "orderTotalPrice",
-                 cakes.name AS "cakeName"
-            FROM orders
-            JOIN cakes ON cakes.id = orders."cakeId"
-            WHERE orders."clientId" = $1;`, [id])
+        const clientOrders = await returnClientOrders(id)
 
         if (clientOrders.rowCount === 0) return res.sendStatus(404)
 

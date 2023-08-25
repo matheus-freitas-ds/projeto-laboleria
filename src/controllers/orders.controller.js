@@ -1,4 +1,5 @@
 import { db } from "../database/database.js"
+import { returnOrder } from "../repositories/orders.repositories.js"
 
 export async function createOrder(req, res) {
     const { clientId, cakeId, quantity, totalPrice } = req.body
@@ -87,25 +88,7 @@ export async function getOrdersById(req, res) {
     const { id } = req.params
 
     try {
-        const orderInfo = await db.query(`
-            SELECT 
-                orders.id AS "orderId",
-                orders.quantity AS "orderQuantity",
-                orders."createdAt" AS "orderCreatedAt",
-                orders."totalPrice" AS "orderTotalPrice",
-                clients.id AS "clientId",
-                clients.name AS "clientName",
-                clients.address AS "clientAddress",
-                clients.phone AS "clientPhone",
-                cakes.id AS "cakeId",
-                cakes.name AS "cakeName",
-                cakes.price AS "cakePrice",
-                cakes.description AS "cakeDescription",
-                cakes.image AS "cakeImage"
-            FROM orders
-            JOIN clients ON clients.id = orders."clientId"
-            JOIN cakes ON cakes.id = orders."cakeId"
-            WHERE orders.id = $1;`, [id])
+        const orderInfo = await returnOrder(id)
 
         if (orderInfo.rowCount === 0) return res.sendStatus(404)
 
